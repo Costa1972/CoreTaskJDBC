@@ -17,12 +17,14 @@ public class UserDaoHibernateImpl implements UserDao{
 
     @Override
     public void createUsersTable() {
-        String script = " CREATE TABLE IF NOT EXISTS `mydb`.`users` (\n" +
-                "  `userId` INT NOT NULL AUTO_INCREMENT,\n" +
+        String script = "CREATE TABLE `mydb`.`users` (\n" +
+                "  `userId` BIGINT(20) NOT NULL AUTO_INCREMENT,\n" +
                 "  `userName` VARCHAR(45) NOT NULL,\n" +
                 "  `userLastName` VARCHAR(45) NOT NULL,\n" +
-                "  `userAge` INT NOT NULL,\n" +
-                "  PRIMARY KEY (`userId`));";
+                "  `userAge` INT(3) NOT NULL,\n" +
+                "  PRIMARY KEY (`userId`))\n" +
+                "ENGINE = InnoDB\n" +
+                "DEFAULT CHARACTER SET = utf8;";
         Session session = getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
         Query query = session.createSQLQuery(script);
@@ -62,10 +64,10 @@ public class UserDaoHibernateImpl implements UserDao{
 
     @Override
     public List<User> getAllUsers() {
-        String script = "SELECT FROM users";
+
         Session session = getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
-        List<User> userList = (List<User>) session.createQuery(script).list();
+        List<User> userList = session.createQuery("FROM " + User.class.getSimpleName()).list();
         transaction.commit();
         session.close();
         return userList;

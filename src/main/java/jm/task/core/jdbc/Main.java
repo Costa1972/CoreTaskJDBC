@@ -9,9 +9,15 @@ public class Main {
         UserDaoHibernateImpl userDaoHibernate = new UserDaoHibernateImpl();
 
 
-//        userService.dropUsersTable();
-//        userService.createUsersTable();
-//        userDaoHibernate.saveUser("Costa", "Vashchuk", (byte) 48);
+        userService.dropUsersTable();
+        userService.createUsersTable();
+        userDaoHibernate.saveUser("Vladimir", "Lenin", (byte) 100);
+        userService.saveUser("Dmitriy", "Sergeev", (byte)19);
+        userService.saveUser("Anton", "Checkhov", (byte) 45);
+        userService.saveUser("Constantin", "Simonov", (byte) 27);
+        System.out.println(userService.getAllUsers());
+        userService.saveUser("Maria", "Osipova", (byte) 19);
+        userService.cleanUsersTable();
         userService.cleanUsersTable();
     }
 }
