@@ -21,16 +21,18 @@ public class User {
     @Column(name = "userAge")
     private byte age;
 
-
-
-    public User(String name, String lastName, byte age) {
+    public User() {
+    }
+    public User(String name, String lastName, byte age){
         this.name = name;
         this.lastName = lastName;
         this.age = age;
     }
 
-    public User() {
 
+    public User(Long id,String name, String lastName, byte age) {
+        this(name, lastName, age);
+        this.id = id;
     }
 
     public String getName() {

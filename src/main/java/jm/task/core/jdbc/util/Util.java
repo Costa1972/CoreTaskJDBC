@@ -10,15 +10,37 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 
+import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 
 public class Util {
-    private static final String URL = "jdbc:mysql://localhost:3306/mydb";
-    private static final String USER = "root";
-    private static String PASSWORD = "root";
+
     private static SessionFactory sessionFactory;
+
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/mydb";
+    private static final String DB_USERNAME = "root";
+    private static final String DB_PASSWORD = "root";
+
+    public static Connection getConnection() {
+        Connection connection = null;
+        try {
+            Driver driver = new com.mysql.cj.jdbc.Driver();
+            DriverManager.registerDriver(driver);
+        } catch (SQLException e) {
+            System.out.println("Не найден класс драйвера!");
+        }
+        try {
+            connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return connection;
+    }
 
 //    public static SessionFactory getSessionFactory() {
 //        StandardServiceRegistry standardServiceRegistry = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
@@ -31,9 +53,9 @@ public class Util {
                 Configuration configuration = new Configuration().configure();
                 Properties settings = new Properties();
                 settings.put(Environment.DRIVER, "com.mysql.cj.jdbc.Driver");
-                settings.put(Environment.URL, URL);
-                settings.put(Environment.USER, USER);
-                settings.put(Environment.PASS, PASSWORD);
+                settings.put(Environment.URL, DB_URL);
+                settings.put(Environment.USER, DB_USERNAME);
+                settings.put(Environment.PASS, DB_PASSWORD);
                 settings.put(Environment.DIALECT, "org.hibernate.dialect.MySQLDialect");                
                 configuration.setProperties(settings);
                 
