@@ -2,10 +2,8 @@ package jm.task.core.jdbc.dao;
 
 import jm.task.core.jdbc.model.User;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import javax.transaction.Transaction;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +17,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     @Override
     public void createUsersTable() {
-        String sqlQuery = "CREATE TABLE `mydb`.`users` (\n" +
+        String sqlQuery = "CREATE TABLE IF NOT EXISTS `mydb`.`users` (\n" +
                 "  `usersId` DOUBLE NOT NULL AUTO_INCREMENT,\n" +
                 "  `usersName` VARCHAR(45) NOT NULL,\n" +
                 "  `usersLastName` VARCHAR(45) NOT NULL,\n" +
@@ -63,11 +61,14 @@ public class UserDaoJDBCImpl implements UserDao {
     @Override
     public void saveUser(String name, String lastName, byte age) {
         String sqlQuery = "INSERT INTO users(usersName, usersLastName, usersAge) values (?, ?, ?)";
-        try (PreparedStatement preparedStatement = getConnection().prepareStatement(sqlQuery)) {
+        try (Connection connection = getConnection()) {
+            connection.setAutoCommit(false);
+            PreparedStatement preparedStatement = getConnection().prepareStatement(sqlQuery);
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, lastName);
             preparedStatement.setInt(3, age);
             preparedStatement.executeUpdate();
+            connection.commit();
             System.out.println("User с именем " + name + " добавлен в БД.");
         } catch (SQLException e) {
             e.printStackTrace();
@@ -84,10 +85,15 @@ public class UserDaoJDBCImpl implements UserDao {
 
     @Override
     public void removeUserById(long id) {
+        Transaction transaction;
         Long l = id;
         String sqlQuery = "DELETE FROM users WHERE usersId = " + id;
-        try (Statement statement = getConnection().createStatement()) {
+        try (Connection connection = getConnection()) {
+            connection.setAutoCommit(false);
+            Statement statement = getConnection().createStatement();
             statement.execute(sqlQuery);
+            connection.commit();
+            System.out.println("User с ID " + id + " удален из БД.");
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -133,7 +139,7 @@ public class UserDaoJDBCImpl implements UserDao {
         String sqlQuery = "TRUNCATE TABLE users";
         try (Statement statement = getConnection().createStatement()) {
             statement.execute(sqlQuery);
-            System.out.println("БД очищена.");
+            System.out.println("Таблица очищена.");
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {

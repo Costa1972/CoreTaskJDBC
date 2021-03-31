@@ -10,6 +10,7 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 
+import java.io.ObjectInputFilter;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
@@ -22,6 +23,8 @@ public class Util {
 
     private static SessionFactory sessionFactory;
 
+    private static final String DRIVER = "com.mysql.cj.jdbc.Driver";
+    private static final String DB_DIALECT = "org.hibernate.dialect.MySQLDialect";
     private static final String DB_URL = "jdbc:mysql://localhost:3306/mydb";
     private static final String DB_USERNAME = "root";
     private static final String DB_PASSWORD = "root";
@@ -42,23 +45,16 @@ public class Util {
         return connection;
     }
 
-//    public static SessionFactory getSessionFactory() {
-//        StandardServiceRegistry standardServiceRegistry = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
-//        Metadata metadata = new MetadataSources(standardServiceRegistry).getMetadataBuilder().build();
-//        return metadata.getSessionFactoryBuilder().build();
-//    }
-    public static SessionFactory getSessionFactory(){
+
+    public static SessionFactory getSessionFactory() {
+        SessionFactory sessionFactory = null;
         if (sessionFactory == null) {
             try {
-                Configuration configuration = new Configuration().configure();
-                Properties settings = new Properties();
-                settings.put(Environment.DRIVER, "com.mysql.cj.jdbc.Driver");
-                settings.put(Environment.URL, DB_URL);
-                settings.put(Environment.USER, DB_USERNAME);
-                settings.put(Environment.PASS, DB_PASSWORD);
-                settings.put(Environment.DIALECT, "org.hibernate.dialect.MySQLDialect");                
-                configuration.setProperties(settings);
-                
+                Configuration configuration = new Configuration().
+                        setProperty("hibernate.connection.driver_class", DRIVER).
+                        setProperty("hibernate.connection.url", DB_URL).
+                        setProperty("hibernate.connection.username", DB_USERNAME).
+                        setProperty("hibernate.connection.password", DB_PASSWORD).setProperty("hibernate.dialect", DB_DIALECT);
                 configuration.addAnnotatedClass(User.class);
                 StandardServiceRegistryBuilder serviceRegistryBuilder = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties());
                 sessionFactory = configuration.buildSessionFactory(serviceRegistryBuilder.build());

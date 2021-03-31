@@ -5,10 +5,9 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import javax.persistence.Query;
-import java.util.ArrayList;
 import java.util.List;
 import static jm.task.core.jdbc.util.Util.*;
-import static org.hibernate.loader.Loader.SELECT;
+
 
 public class UserDaoHibernateImpl implements UserDao{
 
@@ -29,6 +28,7 @@ public class UserDaoHibernateImpl implements UserDao{
         Transaction transaction = session.beginTransaction();
         Query query = session.createSQLQuery(script);
         query.executeUpdate();
+        System.out.println("Таблица создана.");
         transaction.commit();
         session.close();
     }
@@ -40,6 +40,7 @@ public class UserDaoHibernateImpl implements UserDao{
         Transaction transaction = session.beginTransaction();
         Query query = session.createSQLQuery(script);
         query.executeUpdate();
+        System.out.println("Таблица удалена!");
         transaction.commit();
         session.close();
     }
@@ -49,6 +50,7 @@ public class UserDaoHibernateImpl implements UserDao{
         Session session = getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
         session.save(new User(name, lastName, age));
+        System.out.println("User с именем " + name + " добавлен в БД.");
         transaction.commit();
         session.close();
     }
@@ -57,7 +59,8 @@ public class UserDaoHibernateImpl implements UserDao{
     public void removeUserById(long id) {
         Session session = getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
-        session.createSQLQuery ("DELETE FROM users WHERE usersId = " + id);
+        session.createSQLQuery("DELETE FROM users WHERE usersId = " + id);
+        System.out.println("User с ID " + id + " удален из БД.");
         transaction.commit();
         session.close();
     }
@@ -67,7 +70,7 @@ public class UserDaoHibernateImpl implements UserDao{
 
         Session session = getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
-        List<User> userList = session.createQuery("FROM " + User.class.getSimpleName()).list();
+        List<User> userList = session.createQuery("FROM User").list();
         transaction.commit();
         session.close();
         return userList;
@@ -80,6 +83,7 @@ public class UserDaoHibernateImpl implements UserDao{
         Transaction transaction = session.beginTransaction();
         Query query = session.createSQLQuery(script);
         query.executeUpdate();
+        System.out.println("Таблица очищена.");
         transaction.commit();
         session.close();
     }
