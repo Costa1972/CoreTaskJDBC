@@ -85,7 +85,6 @@ public class UserDaoJDBCImpl implements UserDao {
 
     @Override
     public void removeUserById(long id) {
-        Transaction transaction;
         Long l = id;
         String sqlQuery = "DELETE FROM users WHERE usersId = " + id;
         try (Connection connection = getConnection()) {
