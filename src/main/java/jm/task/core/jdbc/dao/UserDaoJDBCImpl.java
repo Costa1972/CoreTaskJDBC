@@ -59,9 +59,10 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     @Override
-    public void saveUser(String name, String lastName, byte age) {
+    public void saveUser(String name, String lastName, byte age) throws SQLException {
+        Connection connection = getConnection();
         String sqlQuery = "INSERT INTO users(usersName, usersLastName, usersAge) values (?, ?, ?)";
-        try (Connection connection = getConnection()) {
+        try {
             connection.setAutoCommit(false);
             PreparedStatement preparedStatement = getConnection().prepareStatement(sqlQuery);
             preparedStatement.setString(1, name);
@@ -71,11 +72,12 @@ public class UserDaoJDBCImpl implements UserDao {
             connection.commit();
             System.out.println("User с именем " + name + " добавлен в БД.");
         } catch (SQLException e) {
+            connection.rollback();
             e.printStackTrace();
         } finally {
             try {
-                if (getConnection() != null) {
-                    getConnection().close();
+                if (connection != null) {
+                    connection.close();
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -84,21 +86,23 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     @Override
-    public void removeUserById(long id) {
+    public void removeUserById(long id) throws SQLException {
+        Connection connection = getConnection();
         Long l = id;
         String sqlQuery = "DELETE FROM users WHERE usersId = " + id;
-        try (Connection connection = getConnection()) {
+        try {
             connection.setAutoCommit(false);
-            Statement statement = getConnection().createStatement();
+            Statement statement = connection.createStatement();
             statement.execute(sqlQuery);
             connection.commit();
             System.out.println("User с ID " + id + " удален из БД.");
         } catch (SQLException e) {
+            connection.rollback();
             e.printStackTrace();
         } finally {
             try {
-                if (getConnection() != null) {
-                    getConnection().close();
+                if (connection != null) {
+                    connection.close();
                 }
             } catch (SQLException e) {
                 e.printStackTrace();

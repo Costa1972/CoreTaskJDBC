@@ -68,10 +68,12 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void removeUserById(long id) {
+
         try {
             session = getSessionFactory().openSession();
+            User user = session.get(User.class, id);
             transaction = session.beginTransaction();
-            session.createSQLQuery("DELETE FROM users WHERE usersId = " + id);
+            session.delete(user);
             System.out.println("User с ID " + id + " удален из БД.");
             transaction.commit();
         } catch (Exception e) {
